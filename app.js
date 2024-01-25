@@ -1,10 +1,11 @@
+require("dotenv").config()
 const express = require("express")
 const app = express()
 const { dbConnect } = require("./db")
 
 const PORT = 4000
 const HOST = "127.0.0.1"
-
+console.log(process.env)
 const authController = require("./controllers/auth")
 const routesController = require("./controllers/routes")
 

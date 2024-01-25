@@ -2,6 +2,8 @@ const router = require("express").Router()
 const User = require("../models/Users")
 const bcrypt = require("bcrypt")
 const SALT = 10
+const jwt = require("jsonwebtoken")
+const JWT_KEY = process.env.JWT_KEY
 
 router.post("/register", async (req, res) => {
     try {
@@ -14,9 +16,20 @@ router.post("/register", async (req, res) => {
         const newUser = new User({ name, email, password: bcrypt.hashSync(password, SALT)})
         await newUser.save()
 
+        // Generate new JWT token
+        const token = jwt.sign(
+            // payload
+            { _id: newUser._id },
+            // secret key
+            JWT_KEY,
+            // options (24 hrs expiration)
+            { expiresIn: 60 * 60 * 24 }
+        )
+
         res.status(201).json({
             message: "User created",
-            newUser
+            newUser,
+            token
         })
     } catch(err) {
         console.log(err)
@@ -48,8 +61,15 @@ router.post("/login", async (req, res) => {
         
         if (!verifyPwd) throw new Error("Incorrect Password")
 
+        const token = jwt.sign(
+            { _id: foundUser._id },
+            JWT_KEY,
+            { expiresIn: 60 * 60 * 24 }
+        )
+
         res.status(200).json({
-            message: "User logged in"
+            message: "User logged in",
+            token
         })
 
     } catch(err) {
