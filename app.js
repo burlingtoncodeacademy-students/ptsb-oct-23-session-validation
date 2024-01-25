@@ -6,10 +6,12 @@ const PORT = 4000
 const HOST = "127.0.0.1"
 
 const authController = require("./controllers/auth")
+const routesController = require("./controllers/routes")
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(authController)
+app.use(routesController)
 
 app.listen(PORT, HOST, () => {
     dbConnect()
